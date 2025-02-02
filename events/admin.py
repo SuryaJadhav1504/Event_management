@@ -42,6 +42,9 @@ class EventDateAdmin(admin.ModelAdmin):
     search_fields = ('event__name',)
     list_filter = ('date',)
 
+
+
+
 # Register models with admin
 admin.site.register(Venue, VenueAdmin)
 admin.site.register(Event, EventAdmin)
