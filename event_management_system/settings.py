@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'events',
     'rest_framework',
     'rest_framework_simplejwt',
+    'import_export',
 ]
 
 AUTH_USER_MODEL = 'auth.User'
