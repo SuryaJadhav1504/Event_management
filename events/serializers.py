@@ -69,3 +69,15 @@ class UpdateUserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['first_name', 'last_name', 'email']
 
+
+from rest_framework import serializers
+from .models import FileUpload
+
+class FileUploadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FileUpload
+        fields = ('user', 'file', 'uploaded_at')
+
+    def create(self, validated_data):
+        # You can add any custom logic here if needed (e.g., saving in background with Celery)
+        return super().create(validated_data)

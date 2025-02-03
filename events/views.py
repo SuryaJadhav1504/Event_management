@@ -21,7 +21,7 @@ class RegisterView(generics.CreateAPIView):
 
 
 class LoginView(generics.GenericAPIView):
-    # permission_classes = [AllowAny]  # Allow any user to hit the login endpoint
+    # permission_classes = [AllowAny]  
     serializer_class = LoginSerializer
     def post(self, request,*args, **kwargs):
         email = request.data.get('email')
@@ -62,7 +62,7 @@ class Dashboard(APIView):
             })
 import redis
 r = redis.Redis(host='localhost', port=6379, db=0)
-print("faskjfnkasjfnkas",r.ping())  
+print("RedisCheck",r.ping())  
 
 
 
@@ -130,15 +130,37 @@ class UpdateUserView(generics.UpdateAPIView):
     serializer_class = UpdateUserSerializer
 
     def get_object(self):
-        # Return the current logged-in user
+        # Return current logged-in user....
         return self.request.user
 
     def patch(self, request, *args, **kwargs):
         user = self.get_object()
-        serializer = self.get_serializer(user, data=request.data, partial=True)  # Allow partial updates
+        serializer = self.get_serializer(user, data=request.data, partial=True) 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+from rest_framework import status
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from .models import FileUpload
+from .serializers import FileUploadSerializer
+from .tasks import process_uploaded_file  # Celery task to process files
+
+class FileUploadView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = FileUploadSerializer(data=request.data)
+        if serializer.is_valid():
+            file_upload = serializer.save()
+            
+            # Trigger background processing task with Celery
+            process_uploaded_file.delay(file_upload.id)
+            
+            return Response({
+                "message": "File uploaded successfully and processing started.",
+                "file_id": file_upload.id
+            }, status=status.HTTP_201_CREATED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

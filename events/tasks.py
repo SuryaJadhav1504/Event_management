@@ -2,6 +2,7 @@ from celery import shared_task
 from django.core.mail import send_mail
 from django.contrib.auth.models import User
 from django.conf import settings
+from .models import FileUpload
 
 @shared_task
 def send_event_creation_email(event_name):
@@ -63,3 +64,26 @@ def send_enrollment_confirmation_email(event_name, user_email):
     except Exception as e:
         print(f"Error in sending enrollment confirmation email: {str(e)}")
         return f"Error: {str(e)}"
+    
+
+
+
+
+@shared_task
+def process_uploaded_file(file_id):
+    try:
+        file_upload = FileUpload.objects.get(id=file_id)
+        
+        # Example: Process the file (you can add any custom processing logic)
+        file_path = file_upload.file.path
+        
+        # For example, just print the file path (you can do something more useful)
+        print(f"Processing file at {file_path}")
+        
+        print(f"File {file_upload.file.name} processed successfully.")
+        
+        return f"File {file_upload.file.name} processed successfully."
+
+    except FileUpload.DoesNotExist:
+        print(f"File with ID {file_id} not found.")
+        return f"Error: File with ID {file_id} not found."

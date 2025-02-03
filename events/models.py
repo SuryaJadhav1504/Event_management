@@ -40,4 +40,10 @@ class Enrollment(models.Model):
 
 
 
+class FileUpload(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    file = models.FileField(upload_to='uploads/')  # Files will be saved in the 'uploads/' folder
+    uploaded_at = models.DateTimeField(auto_now_add=True)
 
+    def __str__(self):
+        return f"File uploaded by {self.user.username} at {self.uploaded_at}"
